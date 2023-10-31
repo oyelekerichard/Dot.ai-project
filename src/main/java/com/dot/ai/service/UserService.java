@@ -1,15 +1,14 @@
 package com.dot.ai.service;
 
 import com.dot.ai.dtos.request.AccountDetailsRequest;
-import com.dot.ai.dtos.request.CreditDebitRequest;
 import com.dot.ai.dtos.request.UserRequest;
-import com.dot.ai.dtos.response.ApiResponse;
+import com.dot.ai.dtos.response.DotApiResponse;
 
 public interface UserService {
-    ApiResponse createAccount(UserRequest userRequest);
+    DotApiResponse createAccount(UserRequest userRequest);
 
-    ApiResponse getAccountBalanceEnquiry(AccountDetailsRequest accountDetailsRequest);
+    DotApiResponse getAccountBalanceEnquiry(AccountDetailsRequest accountDetailsRequest);
 
-    ApiResponse nameEnquiry(AccountDetailsRequest accountDetailsRequest);
+    DotApiResponse nameEnquiry(AccountDetailsRequest accountDetailsRequest);
 
 }

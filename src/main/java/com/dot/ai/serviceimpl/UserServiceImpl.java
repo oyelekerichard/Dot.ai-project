@@ -2,11 +2,10 @@ package com.dot.ai.serviceimpl;
 
 import com.dot.ai.configs.Utility;
 import com.dot.ai.dtos.request.AccountDetailsRequest;
-import com.dot.ai.dtos.request.CreditDebitRequest;
 import com.dot.ai.dtos.request.EmailDetails;
 import com.dot.ai.dtos.request.UserRequest;
 import com.dot.ai.dtos.response.AccountDetails;
-import com.dot.ai.dtos.response.ApiResponse;
+import com.dot.ai.dtos.response.DotApiResponse;
 import com.dot.ai.entites.User;
 import com.dot.ai.enums.Status;
 import com.dot.ai.repositories.EmailRepository;
@@ -36,14 +35,14 @@ public class UserServiceImpl implements UserService {
     private EmailRepository emailRepository;
 
     @Override
-    public ApiResponse createAccount(UserRequest userRequest) {
+    public DotApiResponse createAccount(UserRequest userRequest) {
         /**
          * CREATE A NEW USER AND SAVE NEW USER TO DB
          * Check if new user created already exists by checking in thee db for the email provided
          */
         if (Utility.isValidEmail(userRequest.getEmail())) {
             if ((userRepository.existsByEmail(userRequest.getEmail()))) {
-                return ApiResponse.builder()
+                return DotApiResponse.builder()
                         .status(Status.USER_EXISTS.getStatusCode())
                         .message(Status.USER_EXISTS.getStatusMessage())
                         .result(null)
@@ -63,10 +62,10 @@ public class UserServiceImpl implements UserService {
 //        save sent email details into the email repository
             emailRepository.save(emailDetails);
 
-            return ApiResponse.builder().status(Status.SUCCESS.getStatusCode()).message(Status.SUCCESS.getStatusMessage()).result(AccountDetails.builder().accountNumber(savedUser.getAccountNumber()).accountBalance(savedUser.getAccountBalance()).accountName(savedUser.getFirstName() + " " + savedUser.getLastName() + " " + savedUser.getOtherName()).build()).build();
+            return DotApiResponse.builder().status(Status.SUCCESS.getStatusCode()).message(Status.SUCCESS.getStatusMessage()).result(AccountDetails.builder().accountNumber(savedUser.getAccountNumber()).accountBalance(savedUser.getAccountBalance()).accountName(savedUser.getFirstName() + " " + savedUser.getLastName() + " " + savedUser.getOtherName()).build()).build();
 
         } else {
-            return ApiResponse.builder()
+            return DotApiResponse.builder()
                     .status(Status.INVALID_EMAIL.getStatusCode())
                     .message(Status.INVALID_EMAIL.getStatusMessage())
                     .result(null)
@@ -75,13 +74,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public ApiResponse getAccountBalanceEnquiry(AccountDetailsRequest accountDetailsRequest) {
+    public DotApiResponse getAccountBalanceEnquiry(AccountDetailsRequest accountDetailsRequest) {
 //        check if a user with account number details exsists in the db
 
         Boolean accountExists = userRepository.existsByAccountNumber(accountDetailsRequest.getAccountNumber());
 
         if (!accountExists) {
-            return ApiResponse.builder()
+            return DotApiResponse.builder()
                     .status(Status.USER_DOES_NOT_EXIST.getStatusCode())
                     .message(Status.USER_DOES_NOT_EXIST.getStatusMessage())
                     .result(null)
@@ -89,17 +88,17 @@ public class UserServiceImpl implements UserService {
         }
 
         User foundUser = userRepository.findByAccountNumber(accountDetailsRequest.getAccountNumber());
-        return ApiResponse.builder().status(Status.SUCCESS.getStatusCode()).message(Status.SUCCESS.getStatusMessage()).result(AccountDetails.builder().accountBalance(foundUser.getAccountBalance()).accountNumber(foundUser.getAccountNumber()).accountName(foundUser.getFirstName() + " " + foundUser.getLastName()).build()).build();
+        return DotApiResponse.builder().status(Status.SUCCESS.getStatusCode()).message(Status.SUCCESS.getStatusMessage()).result(AccountDetails.builder().accountBalance(foundUser.getAccountBalance()).accountNumber(foundUser.getAccountNumber()).accountName(foundUser.getFirstName() + " " + foundUser.getLastName()).build()).build();
     }
 
     @Override
-    public ApiResponse nameEnquiry(AccountDetailsRequest accountDetailsRequest) {
+    public DotApiResponse nameEnquiry(AccountDetailsRequest accountDetailsRequest) {
 //        check if a user with account number details exsists in the db
 
         Boolean accountExists = userRepository.existsByAccountNumber(accountDetailsRequest.getAccountNumber());
 
         if (!accountExists) {
-            return ApiResponse.builder()
+            return DotApiResponse.builder()
                     .status(Status.USER_DOES_NOT_EXIST.getStatusCode())
                     .message(Status.USER_DOES_NOT_EXIST.getStatusMessage())
                     .result(null)
@@ -107,7 +106,7 @@ public class UserServiceImpl implements UserService {
         }
 
         User foundUser = userRepository.findByAccountNumber(accountDetailsRequest.getAccountNumber());
-        return ApiResponse.builder().
+        return DotApiResponse.builder().
                 status(Status.SUCCESS.getStatusCode())
                 .message(Status.SUCCESS.getStatusMessage())
                 .result(AccountDetails.builder()

@@ -5,7 +5,7 @@ import com.dot.ai.dtos.request.CreditDebitRequest;
 import com.dot.ai.dtos.request.EmailDetails;
 import com.dot.ai.dtos.request.TransferRequest;
 import com.dot.ai.dtos.response.AccountDetails;
-import com.dot.ai.dtos.response.ApiResponse;
+import com.dot.ai.dtos.response.DotApiResponse;
 import com.dot.ai.entites.Transaction;
 import com.dot.ai.entites.User;
 import com.dot.ai.enums.Status;
@@ -16,10 +16,8 @@ import com.dot.ai.service.EmailService;
 import com.dot.ai.service.TransferService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.AutoConfigurationPackage;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -33,12 +31,12 @@ public class TransferServiceImpl implements TransferService {
     private EmailService emailService;
 
     @Override
-    public ApiResponse creditAccount(CreditDebitRequest request) {
+    public DotApiResponse creditAccount(CreditDebitRequest request) {
 //      check if the account exists or not
 
         Boolean accountExists = userRepository.existsByAccountNumber(request.getAccountNumber());
         if (!accountExists) {
-            return ApiResponse.builder()
+            return DotApiResponse.builder()
                     .status(Status.USER_DOES_NOT_EXIST.getStatusCode())
                     .message(Status.USER_DOES_NOT_EXIST.getStatusMessage())
                     .result(null)
@@ -63,7 +61,7 @@ public class TransferServiceImpl implements TransferService {
 
         transactionRepository.save(transaction);
 
-        return ApiResponse.builder()
+        return DotApiResponse.builder()
                 .status(Status.SUCCESS.getStatusCode())
                 .message(Status.SUCCESS.getStatusMessage())
                 .result(AccountDetails.builder()
@@ -75,7 +73,7 @@ public class TransferServiceImpl implements TransferService {
     }
 
     @Override
-    public ApiResponse debitAccount(CreditDebitRequest request) {
+    public DotApiResponse debitAccount(CreditDebitRequest request) {
 
         String transRef = Utility.generateTransactionRef();
 
@@ -84,7 +82,7 @@ public class TransferServiceImpl implements TransferService {
         Boolean accountExists = userRepository.existsByAccountNumber(request.getAccountNumber());
 
         if (!accountExists) {
-            return ApiResponse.builder()
+            return DotApiResponse.builder()
                     .status(Status.USER_DOES_NOT_EXIST.getStatusCode())
                     .message(Status.USER_DOES_NOT_EXIST.getStatusMessage())
                     .result(null)
@@ -115,7 +113,7 @@ public class TransferServiceImpl implements TransferService {
 
             transactionRepository.save(transaction);
 
-            return ApiResponse.builder()
+            return DotApiResponse.builder()
                     .status(Status.INSUFFICIENT_BALANCE.getStatusCode())
                     .message(Status.INSUFFICIENT_BALANCE.getStatusMessage())
                     .result(null)
@@ -137,7 +135,7 @@ public class TransferServiceImpl implements TransferService {
 
             transactionRepository.save(transaction);
 
-            return ApiResponse.builder()
+            return DotApiResponse.builder()
                     .status(Status.SUCCESS.getStatusCode())
                     .message(Status.SUCCESS.getStatusMessage())
                     .result(AccountDetails.builder()
@@ -150,7 +148,7 @@ public class TransferServiceImpl implements TransferService {
     }
 
     @Override
-    public ApiResponse transfer(TransferRequest transferRequest) {
+    public DotApiResponse transfer(TransferRequest transferRequest) {
 
         String transRef = Utility.generateTransactionRef();
         Double txnFee = 0.00;
@@ -159,7 +157,7 @@ public class TransferServiceImpl implements TransferService {
         Boolean isDestinationAccountExist = userRepository.existsByAccountNumber(transferRequest.getDestinationAccountNumber());
 
         if (!isDestinationAccountExist) {
-            return ApiResponse.builder()
+            return DotApiResponse.builder()
                     .status(Status.USER_DOES_NOT_EXIST.getStatusCode())
                     .message(Status.USER_DOES_NOT_EXIST.getStatusMessage())
                     .result(null)
@@ -178,7 +176,7 @@ public class TransferServiceImpl implements TransferService {
                     .commissionWorthy(false)
                     .build());
 
-            return ApiResponse.builder()
+            return DotApiResponse.builder()
                     .status(Status.INSUFFICIENT_BALANCE.getStatusCode())
                     .message(Status.INSUFFICIENT_BALANCE.getStatusMessage())
                     .result(null)
@@ -235,7 +233,7 @@ public class TransferServiceImpl implements TransferService {
 
         emailService.sendEmailAlerts(creditAlert);
 
-        return ApiResponse.builder()
+        return DotApiResponse.builder()
                 .status(Status.SUCCESS.getStatusCode())
                 .message(Status.SUCCESS.getStatusMessage())
                 .result(transRef)
@@ -243,9 +241,9 @@ public class TransferServiceImpl implements TransferService {
     }
 
     @Override
-    public ApiResponse getAllTransactions() {
+    public DotApiResponse getAllTransactions() {
         List<Transaction> transactions = transactionRepository.findAll();
-        return ApiResponse.builder()
+        return DotApiResponse.builder()
                 .status(Status.SUCCESS.getStatusCode())
                 .message(Status.SUCCESS.getStatusMessage())
                 .result(transactions)
