@@ -9,15 +9,42 @@ public class Utility {
         return email.matches(regex);
     }
 
-    public static double calculateTransactionFee(double amount) {
-        double txnFee = amount * 0.05;
+    public static Double calculateTransactionFee(double amount) {
+        Double txnFee = amount * 0.05;
         if (txnFee > 100) {
-            return 100;
+            return 100.0;
         } else return txnFee;
     }
 
-    public static double commissionFee(double txnFee) {
+    public static Double commissionFee(Double txnFee) {
         return txnFee * 0.02;
+    }
+
+    public static String generateTransactionRef() {
+        {
+            int n = 25;
+
+            // choose a Character random from this String
+            String AlphaString = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                    + "0123456789"
+                    + "abcdefghijklmnopqrstuvxyz";
+
+            // create StringBuffer size of AlphaNumericString
+            StringBuilder sb = new StringBuilder(n);
+
+            for (int i = 0; i < n; i++) {
+
+                // generate a random number between
+                // 0 to AlphaNumericString variable length
+                int index
+                        = (int) (AlphaString.length()
+                        * Math.random());
+
+                // add Character one by one in end of sb
+                sb.append(AlphaString.charAt(index));
+            }
+            return sb.toString();
+        }
     }
 
     public static String generateAccountNumber() {

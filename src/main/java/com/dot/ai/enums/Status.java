@@ -9,6 +9,8 @@ public enum Status {
     INVALID_USERNAME(400, "Username cannot be empty"),
     INVALID_PARAMETER(400, "Invalid Parameter"),
     RECORD_EXISTS(400, "Record already exists"),
+    USER_DOES_NOT_EXIST(400, "User Does Not Exist"),
+    INSUFFICIENT_BALANCE(400, "Insufficient Balance"),
     USER_EXISTS(400, "User Already Exists");
 
     private final int code;
