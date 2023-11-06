@@ -35,4 +35,17 @@ public class Transaction {
     private LocalDateTime dateCreated;
     @UpdateTimestamp
     private LocalDateTime updatedAt;
+
+    public Transaction(String transactionReference, BigDecimal amount, Double transactionFee, String billedAmount, String description, String transactionStatus, Boolean commissionWorthy, Double commission, String userId, LocalDateTime dateCreated) {
+        this.transactionReference = transactionReference;
+        this.amount = amount;
+        this.transactionFee = transactionFee;
+        this.billedAmount = billedAmount;
+        this.description = description;
+        this.transactionStatus = transactionStatus;
+        this.commissionWorthy = commissionWorthy;
+        this.commission = commission;
+        this.userId = userId;
+        this.dateCreated = dateCreated;
+    }
 }

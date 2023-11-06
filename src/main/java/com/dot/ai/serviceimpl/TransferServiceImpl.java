@@ -6,6 +6,7 @@ import com.dot.ai.dtos.request.EmailDetails;
 import com.dot.ai.dtos.request.TransferRequest;
 import com.dot.ai.dtos.response.AccountDetails;
 import com.dot.ai.dtos.response.DotApiResponse;
+import com.dot.ai.dtos.response.TransactionSummary;
 import com.dot.ai.entites.Transaction;
 import com.dot.ai.entites.User;
 import com.dot.ai.enums.Status;
@@ -30,122 +31,6 @@ public class TransferServiceImpl implements TransferService {
     @Autowired
     private EmailService emailService;
 
-    @Override
-    public DotApiResponse creditAccount(CreditDebitRequest request) {
-//      check if the account exists or not
-
-        Boolean accountExists = userRepository.existsByAccountNumber(request.getAccountNumber());
-        if (!accountExists) {
-            return DotApiResponse.builder()
-                    .status(Status.USER_DOES_NOT_EXIST.getStatusCode())
-                    .message(Status.USER_DOES_NOT_EXIST.getStatusMessage())
-                    .result(null)
-                    .build();
-        }
-
-        User userToCredit = userRepository.findByAccountNumber(request.getAccountNumber());
-
-        userToCredit.setAccountBalance(userToCredit.getAccountBalance().add(request.getAmount()));
-
-//        save updated account balance to the database to update the balance od the account
-        userRepository.save(userToCredit);
-
-        Transaction transaction = Transaction.builder()
-                .amount(request.getAmount())
-                .description("Transfer of " + request.getAmount() + " was made to " + userToCredit.getAccountBalance())
-                .transactionStatus(TransactionStatus.SUCCESSFUL.toString())
-                .transactionReference(Utility.generateTransactionRef())
-                .userId(userToCredit.getEmail())
-                .commissionWorthy(false)
-                .build();
-
-        transactionRepository.save(transaction);
-
-        return DotApiResponse.builder()
-                .status(Status.SUCCESS.getStatusCode())
-                .message(Status.SUCCESS.getStatusMessage())
-                .result(AccountDetails.builder()
-                        .accountName(userToCredit.getFirstName() + " " + userToCredit.getLastName())
-                        .accountBalance(userToCredit.getAccountBalance())
-                        .accountNumber(request.getAccountNumber())
-                        .build())
-                .build();
-    }
-
-    @Override
-    public DotApiResponse debitAccount(CreditDebitRequest request) {
-
-        String transRef = Utility.generateTransactionRef();
-
-//        check if the account exists
-//        we will also have to cheeck if the amount to withdraw is not more than the amount in the account
-        Boolean accountExists = userRepository.existsByAccountNumber(request.getAccountNumber());
-
-        if (!accountExists) {
-            return DotApiResponse.builder()
-                    .status(Status.USER_DOES_NOT_EXIST.getStatusCode())
-                    .message(Status.USER_DOES_NOT_EXIST.getStatusMessage())
-                    .result(null)
-                    .build();
-        }
-        log.info("we are here");
-        User userToDebit = userRepository.findByAccountNumber(request.getAccountNumber());
-
-//        do the second check to see if the balance is not less than the amount we want to debit
-        log.info("checking the error emanatiing from here");
-        log.info("checking the error emanatiing from here 11 :: " + userToDebit.getAccountBalance());
-        log.info("checking the error emanatiing from here :: " + userToDebit.getAccountBalance().toString());
-
-        int availableBalance = userToDebit.getAccountBalance().intValue();
-
-        int amountToDebit = request.getAmount().intValue();
-
-        if (availableBalance < amountToDebit) {
-
-            Transaction transaction = Transaction.builder()
-                    .amount(request.getAmount())
-                    .description("Transfer Not Successful")
-                    .transactionStatus(TransactionStatus.INSUFFICIENT_FUND.toString())
-                    .transactionReference(Utility.generateTransactionRef())
-                    .userId(userToDebit.getEmail())
-                    .commissionWorthy(false)
-                    .build();
-
-            transactionRepository.save(transaction);
-
-            return DotApiResponse.builder()
-                    .status(Status.INSUFFICIENT_BALANCE.getStatusCode())
-                    .message(Status.INSUFFICIENT_BALANCE.getStatusMessage())
-                    .result(null)
-                    .build();
-        } else {
-            userToDebit.setAccountBalance(userToDebit.getAccountBalance().subtract(request.getAmount()));
-
-            log.info("ACCOUNT BALANCE DIFFERENCE :: " + ((request.getAmount()).intValue()));
-            userRepository.save(userToDebit);
-
-            Transaction transaction = Transaction.builder()
-                    .amount(request.getAmount())
-                    .description("Transfer  Successful")
-                    .transactionStatus(TransactionStatus.SUCCESSFUL.toString())
-                    .transactionReference(transRef)
-                    .userId(userToDebit.getEmail())
-                    .commissionWorthy(false)
-                    .build();
-
-            transactionRepository.save(transaction);
-
-            return DotApiResponse.builder()
-                    .status(Status.SUCCESS.getStatusCode())
-                    .message(Status.SUCCESS.getStatusMessage())
-                    .result(AccountDetails.builder()
-                            .accountNumber(userToDebit.getAccountNumber())
-                            .accountBalance(userToDebit.getAccountBalance())
-                            .accountName(userToDebit.getFirstName() + " " + userToDebit.getLastName())
-                            .build())
-                    .build();
-        }
-    }
 
     @Override
     public DotApiResponse transfer(TransferRequest transferRequest) {
@@ -243,6 +128,22 @@ public class TransferServiceImpl implements TransferService {
     @Override
     public DotApiResponse getAllTransactions() {
         List<Transaction> transactions = transactionRepository.findAll();
+        return DotApiResponse.builder()
+                .status(Status.SUCCESS.getStatusCode())
+                .message(Status.SUCCESS.getStatusMessage())
+                .result(transactions)
+                .build();
+    }
+
+    @Override
+    public DotApiResponse getAllTransactions(String status, String userId, String startDate, String endDate) {
+        return null;
+    }
+
+    @Override
+    public DotApiResponse getTransactionSummary(String startDate, String endDate) {
+
+        List<TransactionSummary> transactions = transactionRepository.getTransactionSummary(startDate, endDate);
         return DotApiResponse.builder()
                 .status(Status.SUCCESS.getStatusCode())
                 .message(Status.SUCCESS.getStatusMessage())

@@ -8,7 +8,4 @@ public interface UserService {
     DotApiResponse createAccount(UserRequest userRequest);
 
     DotApiResponse getAccountBalanceEnquiry(AccountDetailsRequest accountDetailsRequest);
-
-    DotApiResponse nameEnquiry(AccountDetailsRequest accountDetailsRequest);
-
 }

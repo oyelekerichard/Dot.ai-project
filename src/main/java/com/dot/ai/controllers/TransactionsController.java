@@ -19,32 +19,6 @@ public class TransactionsController {
     @Autowired
     private TransferService transferService;
 
-    @Operation(summary = "Credit account",
-            description = "Credit an account number")
-    @ApiResponse(responseCode = "201",
-            description = "HTTP Status 200")
-    @PostMapping("/creditAccount")
-    public DotApiResponse creditAccount(@RequestBody CreditDebitRequest request) {
-
-        log.info("HERE AT THE creditAccount");
-        return transferService.creditAccount(request);
-    }
-
-    @Operation(summary = "Debit an Account",
-            description = "Debit and account number")
-    @ApiResponse(responseCode = "201",
-            description = "HTTP Status 200")
-    @PostMapping("/debitAccount")
-    public DotApiResponse debitAccount(@RequestBody CreditDebitRequest request) {
-
-        log.info("HERE AT THE debitAccount");
-        return transferService.debitAccount(request);
-    }
-
-    @Operation(summary = "Process transers ",
-            description = "Process tranfers transactions")
-    @ApiResponse(responseCode = "201",
-            description = "HTTP Status 200")
     @PostMapping("/processTransfer")
     public DotApiResponse processTransfer(@RequestBody TransferRequest transferRequest) {
 
@@ -52,14 +26,24 @@ public class TransactionsController {
         return transferService.transfer(transferRequest);
     }
 
-    @Operation(summary = "get all transactions",
-            description = "Get all transactions")
-    @ApiResponse(responseCode = "201",
-            description = "HTTP Status 200")
-    @GetMapping("/getAllTransactions")
-    public DotApiResponse getAllTransactions() {
 
-        log.info("HERE AT THE processTransfer");
-        return transferService.getAllTransactions();
+    @GetMapping("/getAllTransactions")
+    public DotApiResponse getAllTransactions(@RequestParam(required = false) String status,
+                                             @RequestParam(required = false) String userId,
+                                             @RequestParam(required = false) String startDate,
+                                             @RequestParam(required = false) String endDate) {
+
+        log.info("HERE AT THE getAllTransactions");
+        return transferService.getAllTransactions(status, userId, startDate, endDate);
+    }
+
+    @GetMapping("/getTransactionSummary")
+    public DotApiResponse getTransactionSummary(@RequestParam String startDate,
+                                                @RequestParam String endDate) {
+
+        log.info("HERE AT THE getAllTransactions summary");
+        return transferService.getTransactionSummary(startDate, endDate);
     }
 }
+
+

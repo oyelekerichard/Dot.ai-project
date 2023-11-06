@@ -90,30 +90,4 @@ public class UserServiceImpl implements UserService {
         User foundUser = userRepository.findByAccountNumber(accountDetailsRequest.getAccountNumber());
         return DotApiResponse.builder().status(Status.SUCCESS.getStatusCode()).message(Status.SUCCESS.getStatusMessage()).result(AccountDetails.builder().accountBalance(foundUser.getAccountBalance()).accountNumber(foundUser.getAccountNumber()).accountName(foundUser.getFirstName() + " " + foundUser.getLastName()).build()).build();
     }
-
-    @Override
-    public DotApiResponse nameEnquiry(AccountDetailsRequest accountDetailsRequest) {
-//        check if a user with account number details exsists in the db
-
-        Boolean accountExists = userRepository.existsByAccountNumber(accountDetailsRequest.getAccountNumber());
-
-        if (!accountExists) {
-            return DotApiResponse.builder()
-                    .status(Status.USER_DOES_NOT_EXIST.getStatusCode())
-                    .message(Status.USER_DOES_NOT_EXIST.getStatusMessage())
-                    .result(null)
-                    .build();
-        }
-
-        User foundUser = userRepository.findByAccountNumber(accountDetailsRequest.getAccountNumber());
-        return DotApiResponse.builder().
-                status(Status.SUCCESS.getStatusCode())
-                .message(Status.SUCCESS.getStatusMessage())
-                .result(AccountDetails.builder()
-                        .accountBalance(foundUser.getAccountBalance())
-                        .accountName(foundUser.getFirstName() + " " + foundUser.getLastName() + " " + foundUser.getOtherName())
-                        .build())
-                .build();
-    }
-
 }
